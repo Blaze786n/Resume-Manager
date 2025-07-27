@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="portal-container">
+        <h1>Student Portal</h1>
+        <div id="resume-container">
+            <!-- Resume data will be loaded here -->
+        </div>
+        <button id="edit-resume-button">Edit Resume</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/resume');
+            if (response.ok) {
+                const resume = await response.json();
+                if (resume) {
+                    displayResume(resume);
+                } else {
+                    document.getElementById('resume-container').innerHTML = '<p>No resume found. Please create your resume.</p>';
+                }
+            } else {
+                alert('Failed to load resume.');
+            }
+        });
+
+        document.getElementById('edit-resume-button').onclick = function() {
+            window.location.href = 'edit_resume.html';
+        };
+
+        function displayResume(resume) {
+            let resumeHTML = `
+                <h2>${resume.name}</h2>
+                <p>Email: ${resume.email}</p>
+                <p>Phone: ${resume.phone}</p>
+                <h3>Education</h3>
+                <ul>
+                    ${resume.education.map(edu => `<li>${edu.degree}, ${edu.institution} (${edu.year})</li>`).join('')}
+                </ul>
+                <h3>Experience</h3>
+                <ul>
+                    ${resume.experience.map(exp => `<li>${exp.company} - ${exp.role} (${exp.years} years)</li>`).join('')}
+                </ul>
+                <h3>Skills</h3>
+                <ul>
+                    ${resume.skills.map(skill => `<li>${skill}</li>`).join('')}
+                </ul>
+            `;
+            document.getElementById('resume-container').innerHTML = resumeHTML;
+        }
+    </script>
+</body>
+</html>

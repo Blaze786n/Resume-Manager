@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="portal-container">
+        <h1>Admin Portal</h1>
+        <div id="resumes-container">
+            <!-- Resume data will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/admin/resumes');
+            if (response.ok) {
+                const resumes = await response.json();
+                displayResumes(resumes);
+            } else {
+                alert('Failed to load resumes.');
+            }
+        });
+
+        function displayResumes(resumes) {
+            const container = document.getElementById('resumes-container');
+            resumes.forEach(resume => {
+                let resumeHTML = `
+                    <div class="resume">
+                        <h2>${resume.name}</h2>
+                        <p>Email: ${resume.email}</p>
+                        <p>Phone: ${resume.phone}</p>
+                        <h3>Education</h3>
+                        <ul>
+                            ${resume.education.map(edu => `<li>${edu.degree}, ${edu.institution} (${edu.year})</li>`).join('')}
+                        </ul>
+                        <h3>Experience</h3>
+                        <ul>
+                            ${resume.experience.map(exp => `<li>${exp.company} - ${exp.role} (${exp.years} years)</li>`).join('')}
+                        </ul>
+                        <h3>Skills</h3>
+                        <ul>
+                            ${resume.skills.map(skill => `<li>${skill}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                container.innerHTML += resumeHTML;
+            });
+        }
+    </script>
+</body>
+</html>

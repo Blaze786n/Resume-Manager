@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Resume</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="portal-container">
+        <h1>Edit Resume</h1>
+        <form id="resume-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required>
+            <h3>Education</h3>
+            <div id="education-container"></div>
+            <button type="button" id="add-education">Add Education</button>
+            <h3>Experience</h3>
+            <div id="experience-container"></div>
+            <button type="button" id="add-experience">Add Experience</button>
+            <h3>Skills</h3>
+            <div id="skills-container"></div>
+            <button type="button" id="add-skill">Add Skill</button>
+            <button type="submit">Save Resume</button>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript to dynamically add education, experience, and skills fields
+        document.getElementById('add-education').onclick = function() {
+            let container = document.getElementById('education-container');
+            container.innerHTML += `
+                <div>
+                    <input type="text" name="degree" placeholder="Degree">
+                    <input type="text" name="institution" placeholder="Institution">
+                    <input type="number" name="year" placeholder="Year">
+                </div>`;
+        };
+
+        document.getElementById('add-experience').onclick = function() {
+            let container = document.getElementById('experience-container');
+            container.innerHTML += `
+                <div>
+                    <input type="text" name="company" placeholder="Company">
+                    <input type="text" name="role" placeholder="Role">
+                    <input type="number" name="years" placeholder="Years">
+                </div>`;
+        };
+
+        document.getElementById('add-skill').onclick = function() {
+            let container = document.getElementById('skills-container');
+            container.innerHTML += `<input type="text" name="skills" placeholder="Skill">`;
+        };
+
+        document.getElementById('resume-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const resumeData = Object.fromEntries(formData.entries());
+            resumeData.education = [...document.querySelectorAll('#education-container div')].map(div => ({
+                degree: div.querySelector('input[name="degree"]').value,
+                institution: div.querySelector('input[name="institution"]').value,
+                year: parseInt(div.querySelector('input[name="year"]').value)
+            }));
+            resumeData.experience = [...document.querySelectorAll('#experience-container div')].map(div => ({
+                company: div.querySelector('input[name="company"]').value,
+                role: div.querySelector('input[name="role"]').value,
+                years: parseInt(div.querySelector('input[name="years"]').value)
+            }));
+            resumeData.skills = [...document.querySelectorAll('#skills-container input')].map(input => input.value);
+
+            const response = await fetch('/resume', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(resumeData)
+            });
+
+            if (response.ok) {
+                window.location.href = 'student_portal.html';
+            } else {
+                alert('Failed to save resume.');
+            }
+        });
+    </script>
+</body>
+</html>
